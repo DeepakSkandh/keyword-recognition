@@ -1,40 +1,53 @@
-Keyword Recognition using DS-CNN
+<div align="center">
 
-A lightweight keyword spotting system that recognizes 8 spoken
-commands from short audio recordings using a Depthwise Separable
-Convolutional Neural Network (DS-CNN).
+# 🎙️ Keyword Recognition using DS-CNN
 
-The project converts raw speech audio into spectrogram representations
-and uses a compact CNN architecture designed for efficient audio
-classification.
+**A lightweight keyword spotting system that recognizes 8 spoken commands from short audio clips, powered by a Depthwise Separable CNN.**
 
-Project Overview
+[![Python](https://img.shields.io/badge/Python-3.x-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-Keras-FF6F00?logo=tensorflow&logoColor=white)](https://www.tensorflow.org/)
+[![Status](https://img.shields.io/badge/Status-Completed-brightgreen)]()
+[![Accuracy](https://img.shields.io/badge/Accuracy-93%25-blue)]()
+[![License](https://img.shields.io/badge/License-MIT-lightgrey)]()
 
-Keyword spotting is the task of detecting specific spoken commands from
-short audio recordings.
+</div>
 
-This project recognizes the following 8 commands:
+---
 
-down
+## 📑 Table of Contents
 
-left
+- [Overview](#-project-overview)
+- [Model Architecture](#-model-architecture)
+- [Results](#-results)
+- [Training](#-training)
+- [Dataset](#-dataset)
+- [Technologies](#-technologies-used)
+- [Project Structure](#-project-structure)
+- [Installation](#-installation)
+- [Running the Project](#-running-the-project)
+- [Confusion Matrix](#-confusion-matrix)
+- [Why DS-CNN?](#-why-ds-cnn)
+- [Future Improvements](#-future-improvements)
+- [Key Learning Outcomes](#-key-learning-outcomes)
+- [Author](#-author)
 
-no
+---
 
-off
+## 🧭 Project Overview
 
-on
+**Keyword spotting** is the task of detecting specific spoken commands from short audio recordings. This project recognizes **8 commands** using the **Google Speech Commands v0.02** dataset:
 
-right
+<div align="center">
 
-up
+| `down` | `left` | `no` | `off` | `on` | `right` | `up` | `yes` |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 
-yes
+</div>
 
-The model is trained using the Google Speech Commands v0.02 dataset.
+<details>
+<summary><b>🔀 View the processing pipeline</b></summary>
 
-Pipeline
-
+```text
 Raw Audio
     ↓
 Audio Preprocessing
@@ -48,144 +61,130 @@ DS-CNN
 Classification
     ↓
 8 Keyword Classes
+```
 
-Model Architecture
+</details>
 
-The project uses a Depthwise Separable CNN (DS-CNN) architecture.
+---
 
-The model separates spatial filtering from channel mixing using
-depthwise convolution followed by a 1×1 pointwise convolution. This
-provides a lightweight architecture suitable for keyword spotting and
-potential edge deployment.
+## 🏗️ Model Architecture
 
-Architecture
+The model uses a **Depthwise Separable CNN (DS-CNN)**, which separates spatial filtering from channel mixing via a depthwise convolution followed by a `1×1` pointwise convolution — a lightweight design suitable for keyword spotting and edge deployment.
 
+<details open>
+<summary><b>📐 View full architecture diagram</b></summary>
+
+```text
 Input Spectrogram
        ↓
 Resize → 32 × 32
        ↓
 Normalization
        ↓
-Conv2D
-64 filters, 3×3
+Conv2D            64 filters, 3×3
        ↓
-DepthwiseConv2D
-3×3
+DepthwiseConv2D   3×3
        ↓
-Batch Normalization
+BatchNorm → ReLU
        ↓
-ReLU
+Conv2D            128 filters, 1×1
        ↓
-Conv2D
-128 filters, 1×1
+BatchNorm → ReLU
        ↓
-Batch Normalization
+DepthwiseConv2D   3×3
        ↓
-ReLU
+BatchNorm → ReLU
        ↓
-DepthwiseConv2D
-3×3
+Conv2D            256 filters, 1×1
        ↓
-Batch Normalization
-       ↓
-ReLU
-       ↓
-Conv2D
-256 filters, 1×1
-       ↓
-Batch Normalization
-       ↓
-ReLU
+BatchNorm → ReLU
        ↓
 Global Average Pooling
        ↓
 Dropout (0.25)
        ↓
-Dense
-       ↓
-8 Classes
+Dense → 8 Classes
+```
 
-Results
+</details>
 
-The trained model achieved approximately 93% overall accuracy on the
-evaluation data.
+---
 
-Per-Class Performance
+## 📊 Results
 
-Keyword     Correct Predictions   Recall
+<div align="center">
 
-down                350 / 383    91.4%
-left                349 / 380    91.8%
-no                  385 / 406    94.8%
-off                 318 / 362    87.8%
-on                  355 / 388    91.5%
-right               359 / 382    94.0%
-up                  333 / 356    93.5%
-yes                 420 / 429    97.9%
+### Overall Accuracy: **~93%**
 
-The strongest class is yes, while the most noticeable confusion
-occurs between off and up.
+</div>
 
-Training
+<details open>
+<summary><b>📈 Per-class performance (click to expand/collapse)</b></summary>
 
-The model was trained for 30 epochs.
+| Keyword | Correct Predictions | Recall |
+|:---|:---:|:---:|
+| `down`  | 350 / 383 | 91.4% |
+| `left`  | 349 / 380 | 91.8% |
+| `no`    | 385 / 406 | 94.8% |
+| `off`   | 318 / 362 | 87.8% |
+| `on`    | 355 / 388 | 91.5% |
+| `right` | 359 / 382 | 94.0% |
+| `up`    | 333 / 356 | 93.5% |
+| **`yes`** | **420 / 429** | **97.9% 🏆** |
 
-The training curves show that:
+> ✅ Strongest class: **`yes`**
+> ⚠️ Most noticeable confusion: **`off` ↔ `up`**
 
-Training accuracy increases rapidly during the initial epochs.
+</details>
 
-Validation accuracy stabilizes around 92--93%.
+---
 
-Training and validation accuracy converge closely.
+## 🏋️ Training
 
-Training and validation loss decrease substantially during training.
+Trained for **30 epochs**.
 
-There is no significant indication of severe overfitting in the
-later epochs.
+<details>
+<summary><b>📉 Training notes (click to expand)</b></summary>
 
-The validation loss shows some fluctuations during the early epochs
-before stabilizing as training progresses.
+- Training accuracy increases rapidly during the initial epochs.
+- Validation accuracy stabilizes around **92–93%**.
+- Training and validation accuracy converge closely.
+- Training and validation loss decrease substantially during training.
+- No significant indication of severe overfitting in later epochs.
+- Validation loss fluctuates early on before stabilizing.
 
-Dataset
+</details>
 
-This project uses the Speech Commands v0.02 dataset, containing
-short spoken-word audio recordings across multiple command categories.
+---
 
-Only the following 8 classes are used:
+## 🗂️ Dataset
 
-down
-left
-no
-off
-on
-right
-up
-yes
+Uses the **Speech Commands v0.02** dataset, filtered down to 8 classes: `down`, `left`, `no`, `off`, `on`, `right`, `up`, `yes`.
 
-The complete dataset is approximately 2.3 GB, so it is not
-included in this repository.
+> ⚠️ The complete dataset is **~2.3 GB** and is **not included** in this repository. The notebook contains the logic to download and extract it automatically.
 
-The notebook contains the logic required to download and extract the
-dataset.
+---
 
-Technologies Used
+## 🛠️ Technologies Used
 
-Python
+<div align="center">
 
-TensorFlow / Keras
+![Python](https://img.shields.io/badge/-Python-3776AB?logo=python&logoColor=white)
+![TensorFlow](https://img.shields.io/badge/-TensorFlow-FF6F00?logo=tensorflow&logoColor=white)
+![Keras](https://img.shields.io/badge/-Keras-D00000?logo=keras&logoColor=white)
+![NumPy](https://img.shields.io/badge/-NumPy-013243?logo=numpy&logoColor=white)
+![Matplotlib](https://img.shields.io/badge/-Matplotlib-11557C)
+![SciPy](https://img.shields.io/badge/-SciPy-8CAAE6?logo=scipy&logoColor=white)
+![Jupyter](https://img.shields.io/badge/-Jupyter-F37626?logo=jupyter&logoColor=white)
+![WSL/Ubuntu](https://img.shields.io/badge/-WSL%2FUbuntu-E95420?logo=ubuntu&logoColor=white)
 
-NumPy
+</div>
 
-Matplotlib
+---
 
-SciPy
+## 📁 Project Structure
 
-Jupyter Notebook
-
-WSL / Ubuntu
-
-Project Structure
-
+```text
 keyword-recognition/
 │
 ├── data/
@@ -203,170 +202,163 @@ keyword-recognition/
 ├── .gitignore
 ├── README.md
 └── requirements.txt
+```
 
-Installation
+---
 
-Clone the repository:
+## ⚙️ Installation
 
+<details open>
+<summary><b>1️⃣ Clone the repository</b></summary>
+
+```bash
 git clone <YOUR_GITHUB_REPOSITORY_URL>
 cd keyword-recognition
+```
 
-Create a virtual environment:
+</details>
 
+<details>
+<summary><b>2️⃣ Create a virtual environment</b></summary>
+
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
+```
 
-Install dependencies:
+</details>
 
+<details>
+<summary><b>3️⃣ Install dependencies</b></summary>
+
+```bash
 pip install -r requirements.txt
+```
 
-Dataset Setup
+</details>
 
-The Speech Commands dataset should be downloaded separately.
+<details>
+<summary><b>4️⃣ Set up the dataset</b></summary>
 
-The project expects the extracted dataset at:
+The Speech Commands dataset should be downloaded separately and extracted to:
 
+```text
 data/speech_commands/
+```
 
-The dataset itself should not be committed to GitHub.
+The dataset itself should **not** be committed to GitHub.
 
-Running the Project
+</details>
 
-Launch Jupyter:
+---
 
+## ▶️ Running the Project
+
+```bash
 jupyter notebook
+```
 
-Open:
+Then open:
 
+```text
 notebooks/simple_audio_8commands.ipynb
+```
 
-Run the notebook cells sequentially.
+Run the notebook cells sequentially. The notebook walks through:
 
-The notebook covers:
+- [x] Environment setup
+- [x] Dataset download and extraction
+- [x] Audio loading
+- [x] Audio preprocessing
+- [x] Spectrogram generation
+- [x] Dataset preparation
+- [x] DS-CNN construction
+- [x] Model training
+- [x] Training and validation evaluation
+- [x] Confusion matrix generation
 
-Environment setup
+---
 
-Dataset download and extraction
+## 🔎 Confusion Matrix
 
-Audio loading
+The confusion matrix shows strong diagonal dominance — most samples are correctly classified.
 
-Audio preprocessing
+> **Main source of confusion:** `off` ↔ `up`
 
-Spectrogram generation
+This suggests these commands could benefit from additional data augmentation, feature engineering, or architecture/hyperparameter tuning in a future iteration.
 
-Dataset preparation
+---
 
-DS-CNN construction
+## ❓ Why DS-CNN?
 
-Model training
+A conventional convolution performs spatial filtering and channel mixing together. A **depthwise separable convolution** decomposes this into:
 
-Training and validation evaluation
+```text
+Depthwise Convolution  +  Pointwise (1×1) Convolution
+```
 
-Confusion matrix generation
+This reduces computational cost while maintaining strong feature extraction — making DS-CNN attractive for:
 
-Confusion Matrix
+| Use Case | Fit |
+|---|:---:|
+| Embedded devices | ✅ |
+| Mobile applications | ✅ |
+| Edge AI devices | ✅ |
+| Voice-controlled systems | ✅ |
+| Resource-constrained hardware | ✅ |
 
-The confusion matrix shows strong diagonal dominance, indicating that
-most samples are correctly classified.
+---
 
-The main source of confusion is:
+## 🚀 Future Improvements
 
-off ↔ up
+- [ ] Add more Speech Commands classes
+- [ ] Compare DS-CNN with a standard CNN
+- [ ] Experiment with MFCC features
+- [ ] Improve audio augmentation
+- [ ] Tune learning rate and other hyperparameters
+- [ ] Optimize the model using TensorFlow Lite
+- [ ] Apply post-training quantization
+- [ ] Measure inference latency and model size
+- [ ] Deploy the model for real-time microphone-based keyword detection
+- [ ] Test deployment on an embedded or edge device
 
-This suggests that these commands could benefit from additional data
-augmentation, feature engineering, or architecture/hyperparameter tuning
-in a future iteration.
+---
 
-Why DS-CNN?
+## 🎓 Key Learning Outcomes
 
-A conventional convolution performs spatial filtering and channel mixing
-together. A depthwise separable convolution decomposes this into:
+<details>
+<summary><b>Click to expand full list</b></summary>
 
-Depthwise Convolution
-        +
-Pointwise (1×1) Convolution
+- Audio classification
+- Speech spectrograms
+- Audio preprocessing
+- Convolutional neural networks
+- Depthwise separable convolutions
+- Batch normalization
+- Global average pooling
+- Dropout
+- Model training and validation
+- Confusion matrix analysis
+- Keyword spotting
+- Lightweight neural network design
+- Practical ML project organization
 
-This reduces computational cost while maintaining strong feature
-extraction capability.
+</details>
 
-This makes DS-CNN particularly attractive for keyword spotting systems
-intended for:
+---
 
-Embedded devices
+## ✅ Project Status
 
-Mobile applications
+**Completed** — recognizes 8 spoken commands with ~93% evaluation accuracy using a lightweight DS-CNN architecture.
 
-Edge AI devices
+---
 
-Voice-controlled systems
+## 👤 Author
 
-Resource-constrained hardware
+<div align="center">
 
-Future Improvements
+**Deepak Skandh**
 
-Possible extensions include:
+*A hands-on project exploring Deep Learning, Audio Processing, Keyword Spotting, and Edge AI.*
 
-Add more Speech Commands classes
-
-Compare DS-CNN with a standard CNN
-
-Experiment with MFCC features
-
-Improve audio augmentation
-
-Tune learning rate and other hyperparameters
-
-Optimize the model using TensorFlow Lite
-
-Apply post-training quantization
-
-Measure inference latency and model size
-
-Deploy the model for real-time microphone-based keyword detection
-
-Test deployment on an embedded or edge device
-
-Key Learning Outcomes
-
-This project provided hands-on experience with:
-
-Audio classification
-
-Speech spectrograms
-
-Audio preprocessing
-
-Convolutional neural networks
-
-Depthwise separable convolutions
-
-Batch normalization
-
-Global average pooling
-
-Dropout
-
-Model training and validation
-
-Confusion matrix analysis
-
-Keyword spotting
-
-Lightweight neural network design
-
-Practical ML project organization
-
-Project Status
-
-Completed
-
-The current implementation successfully recognizes 8 spoken commands
-with approximately 93% evaluation accuracy using a lightweight
-DS-CNN architecture.
-
-Author
-
-Deepak Skandh
-
-A hands-on project exploring Deep Learning, Audio Processing, Keyword
-Spotting, and Edge AI.
+</div>
